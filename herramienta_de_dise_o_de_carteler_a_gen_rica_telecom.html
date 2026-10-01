@@ -1,0 +1,660 @@
+<!DOCTYPE html>
+<html lang="es" class="h-full">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Herramienta de Diseño de Cartelería Genérica Telecom</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- FontAwesome for Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts Inter -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <!-- html2canvas for exporting -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                    }
+                }
+            }
+        }
+    </script>
+</head>
+<body class="h-full bg-slate-950 text-slate-100 flex flex-col md:flex-row overflow-hidden font-sans">
+
+    <!-- Sidebar Controls -->
+    <aside class="w-full md:w-[450px] bg-slate-900 border-r border-slate-800 flex flex-col h-full z-20 shadow-2xl">
+        <!-- Header -->
+        <div class="p-5 border-b border-slate-800 flex items-center justify-between bg-slate-900/80 backdrop-blur">
+            <div class="flex items-center space-x-3">
+                <div class="w-9 h-9 rounded-xl bg-indigo-600 flex items-center justify-center text-white shadow-lg shadow-indigo-500/30">
+                    <i class="fa-solid fa-tower-broadcast text-lg"></i>
+                </div>
+                <div>
+                    <h1 class="font-bold text-base text-white tracking-tight">Telecom Design Studio</h1>
+                    <p class="text-xs text-slate-400">Creador Profesional de Cartelería</p>
+                </div>
+            </div>
+            <button id="reset-btn" class="text-xs text-slate-400 hover:text-white px-2.5 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 transition">
+                <i class="fa-solid fa-rotate-right mr-1"></i> Reiniciar
+            </button>
+        </div>
+
+        <!-- Scrollable Controls -->
+        <div class="flex-1 overflow-y-auto p-5 space-y-6 custom-scrollbar">
+            
+            <!-- Format Switcher -->
+            <div class="space-y-2">
+                <label class="text-xs font-semibold uppercase tracking-wider text-slate-400">Formato de Salida</label>
+                <div class="grid grid-cols-2 gap-2">
+                    <button type="button" id="format-square" onclick="setFormat('square')" class="format-btn flex items-center justify-center space-x-2 py-2.5 px-3 rounded-xl border border-indigo-500 bg-indigo-600/10 text-indigo-300 font-medium text-xs transition">
+                        <i class="fa-solid fa-square"></i>
+                        <span>Cuadrado (1:1)</span>
+                    </button>
+                    <button type="button" id="format-vertical" onclick="setFormat('vertical')" class="format-btn flex items-center justify-center space-x-2 py-2.5 px-3 rounded-xl border border-slate-700 bg-slate-800/50 text-slate-400 font-medium text-xs hover:border-slate-600 transition">
+                        <i class="fa-solid fa-rectangle-vertical"></i>
+                        <span>A4 Vertical</span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Quick Sample Offers -->
+            <div class="space-y-2">
+                <label class="text-xs font-semibold uppercase tracking-wider text-slate-400">Ofertas Predefinidas R rápidas</label>
+                <div class="grid grid-cols-3 gap-2">
+                    <button onclick="loadSample('fiber')" class="p-2 rounded-xl bg-slate-800 hover:bg-indigo-600/20 hover:border-indigo-500 border border-slate-700 text-left transition group">
+                        <div class="text-indigo-400 group-hover:text-indigo-300 font-semibold text-xs mb-0.5"><i class="fa-solid fa-bolt mr-1"></i> Fibra 1Gbps</div>
+                        <div class="text-[10px] text-slate-400">Alta velocidad simétrica</div>
+                    </button>
+                    <button onclick="loadSample('convergent')" class="p-2 rounded-xl bg-slate-800 hover:bg-indigo-600/20 hover:border-indigo-500 border border-slate-700 text-left transition group">
+                        <div class="text-indigo-400 group-hover:text-indigo-300 font-semibold text-xs mb-0.5"><i class="fa-solid fa-mobile-screen mr-1"></i> Fibra + Móvil</div>
+                        <div class="text-[10px] text-slate-400">Pack Ahorro Total</div>
+                    </button>
+                    <button onclick="loadSample('business')" class="p-2 rounded-xl bg-slate-800 hover:bg-indigo-600/20 hover:border-indigo-500 border border-slate-700 text-left transition group">
+                        <div class="text-indigo-400 group-hover:text-indigo-300 font-semibold text-xs mb-0.5"><i class="fa-solid fa-briefcase mr-1"></i> Empresas</div>
+                        <div class="text-[10px] text-slate-400">Centralita & Redes</div>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Branding & Colors -->
+            <div class="space-y-4 pt-2 border-t border-slate-800">
+                <h3 class="text-xs font-semibold uppercase tracking-wider text-slate-400">Marca y Colores</h3>
+                <div class="grid grid-cols-2 gap-3">
+                    <div>
+                        <label class="block text-xs text-slate-300 mb-1">Nombre Operador</label>
+                        <input type="text" id="input-operator" value="FIBRA MÁS" oninput="updateContent()" class="w-full bg-slate-800 border border-slate-700 rounded-xl px-3 py-2 text-sm text-white focus:outline-none focus:border-indigo-500">
+                    </div>
+                    <div>
+                        <label class="block text-xs text-slate-300 mb-1">Logo URL / Archivo</label>
+                        <input type="text" id="input-logo" value="https://placehold.co/120x40/4f46e5/ffffff?text=OPERADOR" oninput="updateContent()" class="w-full bg-slate-800 border border-slate-700 rounded-xl px-3 py-2 text-sm text-white focus:outline-none focus:border-indigo-500">
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-2 gap-3">
+                    <div>
+                        <label class="block text-xs text-slate-300 mb-1">Color Principal</label>
+                        <div class="flex items-center space-x-2">
+                            <input type="color" id="input-color-primary" value="#4f46e5" onchange="updateContent()" class="w-10 h-10 rounded-xl bg-transparent cursor-pointer border border-slate-700">
+                            <input type="text" id="text-color-primary" value="#4f46e5" oninput="syncColor('primary')" class="w-full bg-slate-800 border border-slate-700 rounded-xl px-3 py-2 text-xs text-white uppercase">
+                        </div>
+                    </div>
+                    <div>
+                        <label class="block text-xs text-slate-300 mb-1">Color Secundario</label>
+                        <div class="flex items-center space-x-2">
+                            <input type="color" id="input-color-secondary" value="#06b6d4" onchange="updateContent()" class="w-10 h-10 rounded-xl bg-transparent cursor-pointer border border-slate-700">
+                            <input type="text" id="text-color-secondary" value="#06b6d4" oninput="syncColor('secondary')" class="w-full bg-slate-800 border border-slate-700 rounded-xl px-3 py-2 text-xs text-white uppercase">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Background Color Customization -->
+                <div class="space-y-3 pt-2">
+                    <label class="block text-xs text-slate-300">Fondo del Cartel</label>
+                    <div class="grid grid-cols-2 gap-3">
+                        <div>
+                            <label class="block text-[10px] text-slate-400 mb-1">Color Base / Gradiente</label>
+                            <div class="flex items-center space-x-2">
+                                <input type="color" id="input-bg-color" value="#0f172a" onchange="updateContent()" class="w-10 h-10 rounded-xl bg-transparent cursor-pointer border border-slate-700">
+                                <select id="input-bg-preset" onchange="applyBgPreset(this.value)" class="w-full bg-slate-800 border border-slate-700 rounded-xl px-2 py-2 text-xs text-white focus:outline-none focus:border-indigo-500">
+                                    <option value="custom">Personalizado</option>
+                                    <option value="midnight" selected>Medianoche Oscuro</option>
+                                    <option value="vibrant">Azul Vibrante</option>
+                                    <option value="darkblue">Azul Marino Profundo</option>
+                                    <option value="cleanlight">Claro Minimalista</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div>
+                            <label class="block text-[10px] text-slate-400 mb-1">Opacidad Foto Fondo</label>
+                            <input type="range" id="input-bg-opacity" min="0" max="1" step="0.05" value="0.35" oninput="updateContent()" class="w-full accent-indigo-500 mt-2">
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Background Photography / Location -->
+            <div class="space-y-3 pt-2 border-t border-slate-800">
+                <div class="flex items-center justify-between">
+                    <label class="text-xs font-semibold uppercase tracking-wider text-slate-400">Fotografía de Localidad</label>
+                    <span class="text-[10px] text-indigo-400 bg-indigo-500/10 px-2 py-0.5 rounded-full border border-indigo-500/20"><i class="fa-solid fa-camera mr-1"></i> Geo-Foto</span>
+                </div>
+                <div class="flex space-x-2">
+                    <input type="text" id="input-location" value="Cádiz, España" placeholder="Ej. Sevilla, Madrid, Málaga..." class="flex-1 bg-slate-800 border border-slate-700 rounded-xl px-3 py-2 text-sm text-white focus:outline-none focus:border-indigo-500">
+                    <button onclick="fetchLocationPhoto()" class="bg-indigo-600 hover:bg-indigo-500 text-white px-4 py-2 rounded-xl text-xs font-medium transition shadow-lg shadow-indigo-600/30 flex items-center space-x-1">
+                        <i class="fa-solid fa-magnifying-glass"></i>
+                        <span>Buscar</span>
+                    </button>
+                </div>
+                <div>
+                    <label class="block text-[10px] text-slate-400 mb-1">O URL de Imagen Directa</label>
+                    <input type="text" id="input-bg-image" value="https://images.unsplash.com/photo-1513635269975-59663e0ac1ad?auto=format&fit=crop&w=1200&q=80" oninput="updateContent()" class="w-full bg-slate-800 border border-slate-700 rounded-xl px-3 py-2 text-xs text-slate-300 focus:outline-none focus:border-indigo-500">
+                </div>
+            </div>
+
+            <!-- Offer Copy -->
+            <div class="space-y-4 pt-2 border-t border-slate-800">
+                <h3 class="text-xs font-semibold uppercase tracking-wider text-slate-400">Textos de la Oferta</h3>
+                <div>
+                    <label class="block text-xs text-slate-300 mb-1">Título Principal (Ej. Fibra 1Gbps)</label>
+                    <input type="text" id="input-title" value="FIBRA ÓPTICA 1 Gbps" oninput="updateContent()" class="w-full bg-slate-800 border border-slate-700 rounded-xl px-3 py-2 text-sm text-white focus:outline-none focus:border-indigo-500">
+                </div>
+                
+                <div class="grid grid-cols-2 gap-3">
+                    <div>
+                        <label class="block text-xs text-slate-300 mb-1">Precio</label>
+                        <input type="text" id="input-price" value="24,90" oninput="updateContent()" class="w-full bg-slate-800 border border-slate-700 rounded-xl px-3 py-2 text-sm text-white focus:outline-none focus:border-indigo-500 font-bold">
+                    </div>
+                    <div>
+                        <label class="block text-xs text-slate-300 mb-1">Sufijo Precio (Ej. €/mes)</label>
+                        <input type="text" id="input-price-suffix" value="€ / mes" oninput="updateContent()" class="w-full bg-slate-800 border border-slate-700 rounded-xl px-3 py-2 text-sm text-white focus:outline-none focus:border-indigo-500">
+                    </div>
+                </div>
+
+                <div>
+                    <label class="block text-xs text-slate-300 mb-1">Subtítulo / Promoción</label>
+                    <input type="text" id="input-subtitle" value="IVA incluido + Router Wi-Fi 6 de alta potencia" oninput="updateContent()" class="w-full bg-slate-800 border border-slate-700 rounded-xl px-3 py-2 text-sm text-white focus:outline-none focus:border-indigo-500">
+                </div>
+            </div>
+
+            <!-- Dynamic Key Features -->
+            <div class="space-y-3 pt-2 border-t border-slate-800">
+                <div class="flex items-center justify-between">
+                    <label class="text-xs font-semibold uppercase tracking-wider text-slate-400">Características Clave</label>
+                    <button onclick="addFeature()" class="text-xs text-indigo-400 hover:text-indigo-300 bg-indigo-500/10 hover:bg-indigo-500/20 px-2.5 py-1 rounded-lg border border-indigo-500/20 transition flex items-center space-x-1">
+                        <i class="fa-solid fa-plus"></i>
+                        <span>Añadir punto</span>
+                    </button>
+                </div>
+                <div id="features-container" class="space-y-2">
+                    <!-- Dynamic Items will be rendered here -->
+                </div>
+            </div>
+
+            <!-- Footer & Contact -->
+            <div class="space-y-4 pt-2 border-t border-slate-800">
+                <h3 class="text-xs font-semibold uppercase tracking-wider text-slate-400">Pie de Página y Contacto</h3>
+                <div class="grid grid-cols-2 gap-3">
+                    <div>
+                        <label class="block text-xs text-slate-300 mb-1">Teléfono</label>
+                        <input type="text" id="input-phone" value="900 123 456" oninput="updateContent()" class="w-full bg-slate-800 border border-slate-700 rounded-xl px-3 py-2 text-sm text-white focus:outline-none focus:border-indigo-500">
+                    </div>
+                    <div>
+                        <label class="block text-xs text-slate-300 mb-1">Web / Tienda</label>
+                        <input type="text" id="input-web" value="www.tutelcom.es" oninput="updateContent()" class="w-full bg-slate-800 border border-slate-700 rounded-xl px-3 py-2 text-sm text-white focus:outline-none focus:border-indigo-500">
+                    </div>
+                </div>
+                <div>
+                    <label class="block text-xs text-slate-300 mb-1">Texto Legal / Letra Pequeña</label>
+                    <input type="text" id="input-legal" value="Promoción válida hasta fin de mes. Sujeta a cobertura de fibra propia." oninput="updateContent()" class="w-full bg-slate-800 border border-slate-700 rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-indigo-500">
+                </div>
+            </div>
+
+        </div>
+
+        <!-- Export Footer Action -->
+        <div class="p-4 border-t border-slate-800 bg-slate-900 flex items-center justify-between">
+            <div class="text-xs text-slate-400">
+                <i class="fa-solid fa-circle-check text-emerald-400 mr-1"></i> Listo para exportar
+            </div>
+            <button onclick="exportPoster()" class="bg-gradient-to-r from-indigo-600 to-violet-600 hover:from-indigo-500 hover:to-violet-500 text-white font-semibold px-5 py-2.5 rounded-xl text-xs shadow-lg shadow-indigo-600/30 transition flex items-center space-x-2">
+                <i class="fa-solid fa-download"></i>
+                <span>Descargar Cartel HD</span>
+            </button>
+        </div>
+    </aside>
+
+    <!-- Live Preview Area -->
+    <main class="flex-1 bg-slate-950 flex flex-col h-full overflow-hidden relative">
+        <!-- Top Toolbar -->
+        <header class="h-16 border-b border-slate-800/80 bg-slate-900/40 backdrop-blur px-6 flex items-center justify-between z-10">
+            <div class="flex items-center space-x-2 text-sm text-slate-400">
+                <span>Vista Previa en Tiempo Real</span>
+                <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
+            </div>
+            <div class="flex items-center space-x-3">
+                <button onclick="zoomPreview(0.9)" class="w-8 h-8 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 flex items-center justify-center transition" title="Reducir Zoom">
+                    <i class="fa-solid fa-minus text-xs"></i>
+                </button>
+                <span id="zoom-level" class="text-xs text-slate-400 font-mono">100%</span>
+                <button onclick="zoomPreview(1.1)" class="w-8 h-8 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 flex items-center justify-center transition" title="Aumentar Zoom">
+                    <i class="fa-solid fa-plus text-xs"></i>
+                </button>
+            </div>
+        </header>
+
+        <!-- Preview Canvas Container -->
+        <div id="canvas-scroll-container" class="flex-1 overflow-auto flex items-center justify-center p-8 relative">
+            
+            <!-- Poster Wrapper -->
+            <div id="poster-wrapper" class="transition-all duration-300 shadow-2xl relative flex items-center justify-center" style="transform: scale(1);">
+                
+                <!-- Actual Poster Element (Square 1080x1080 default) -->
+                <div id="poster-card" class="relative w-[1080px] h-[1080px] overflow-hidden flex flex-col justify-between text-white font-sans select-none" style="background-color: #0f172a;">
+                    
+                    <!-- Background Layers -->
+                    <div id="poster-bg-color-layer" class="absolute inset-0 z-0 transition-all duration-300" style="background: linear-gradient(135deg, #0f172a 0%, #1e1b4b 100%);"></div>
+                    <div id="poster-bg-img-layer" class="absolute inset-0 z-1 bg-cover bg-center transition-all duration-500 opacity-35 mix-blend-overlay" style="background-image: url('https://images.unsplash.com/photo-1513635269975-59663e0ac1ad?auto=format&fit=crop&w=1200&q=80');"></div>
+                    <!-- Ambient Glow Gradients -->
+                    <div id="poster-glow-1" class="absolute -top-32 -left-32 w-96 h-96 rounded-full blur-3xl opacity-40 z-2 transition-all duration-300" style="background-color: #4f46e5;"></div>
+                    <div id="poster-glow-2" class="absolute -bottom-32 -right-32 w-96 h-96 rounded-full blur-3xl opacity-30 z-2 transition-all duration-300" style="background-color: #06b6d4;"></div>
+
+                    <!-- Header Section -->
+                    <div class="relative z-10 p-12 flex justify-between items-start">
+                        <div class="flex items-center space-x-4 bg-slate-900/60 backdrop-blur-md px-6 py-3.5 rounded-2xl border border-white/10 shadow-xl">
+                            <img id="preview-logo" src="https://placehold.co/120x40/4f46e5/ffffff?text=OPERADOR" alt="Logo" class="h-9 object-contain" onerror="this.src='https://placehold.co/120x40/4f46e5/ffffff?text=OPERADOR'">
+                            <div class="h-6 w-px bg-white/20"></div>
+                            <span id="preview-operator" class="font-extrabold tracking-wider text-xl uppercase bg-gradient-to-r from-white to-slate-300 bg-clip-text text-transparent">FIBRA MÁS</span>
+                        </div>
+                        <div id="preview-badge" class="px-5 py-2.5 rounded-2xl bg-gradient-to-r from-indigo-600 to-violet-600 text-white font-bold text-sm tracking-wide uppercase shadow-lg shadow-indigo-500/40 border border-white/20 flex items-center space-x-2">
+                            <i class="fa-solid fa-bolt-lightning text-yellow-300"></i>
+                            <span>Oferta Exclusiva Local</span>
+                        </div>
+                    </div>
+
+                    <!-- Center Offer Content -->
+                    <div class="relative z-10 px-16 my-auto flex flex-col items-center text-center">
+                        <h2 id="preview-title" class="text-6xl font-black tracking-tight leading-tight uppercase mb-6 drop-shadow-md">
+                            FIBRA ÓPTICA 1 Gbps
+                        </h2>
+
+                        <!-- Price Card Box -->
+                        <div class="my-4 px-10 py-6 rounded-3xl bg-slate-900/70 backdrop-blur-xl border border-white/15 shadow-2xl flex items-baseline space-x-3 relative overflow-hidden group">
+                            <div class="absolute inset-0 bg-gradient-to-r from-indigo-500/10 to-cyan-500/10 pointer-events-none"></div>
+                            <span id="preview-price" class="text-9xl font-black tracking-tighter text-white drop-shadow-lg">24,90</span>
+                            <div class="flex flex-col text-left">
+                                <span id="preview-price-suffix" class="text-2xl font-bold text-indigo-300">€ / mes</span>
+                                <span class="text-xs text-slate-400 font-medium">Sin sorpresas</span>
+                            </div>
+                        </div>
+
+                        <p id="preview-subtitle" class="text-xl text-slate-200 font-medium max-w-2xl mt-4 drop-shadow">
+                            IVA incluido + Router Wi-Fi 6 de alta potencia
+                        </p>
+
+                        <!-- Features List Grid -->
+                        <div id="preview-features" class="grid grid-cols-2 gap-4 w-full max-w-3xl mt-8">
+                            <!-- Rendered dynamically -->
+                        </div>
+                    </div>
+
+                    <!-- Footer Section -->
+                    <div class="relative z-10 p-12 pt-0 flex flex-col space-y-4">
+                        <div class="bg-slate-900/80 backdrop-blur-xl border border-white/10 p-6 rounded-3xl flex items-center justify-between shadow-2xl">
+                            <div class="flex items-center space-x-6">
+                                <div class="w-14 h-14 rounded-2xl bg-indigo-600/30 border border-indigo-400/40 flex items-center justify-center text-indigo-300 text-2xl shadow-inner">
+                                    <i class="fa-solid fa-phone-volume animate-bounce"></i>
+                                </div>
+                                <div class="text-left">
+                                    <div class="text-xs text-slate-400 uppercase tracking-widest font-semibold">Llama gratis hoy</div>
+                                    <div id="preview-phone" class="text-3xl font-black tracking-tight text-white">900 123 456</div>
+                                </div>
+                            </div>
+                            <div class="h-12 w-px bg-white/15"></div>
+                            <div class="flex items-center space-x-6">
+                                <div class="w-14 h-14 rounded-2xl bg-cyan-600/30 border border-cyan-400/40 flex items-center justify-center text-cyan-300 text-2xl shadow-inner">
+                                    <i class="fa-solid fa-globe"></i>
+                                </div>
+                                <div class="text-left">
+                                    <div class="text-xs text-slate-400 uppercase tracking-widest font-semibold">Consulta online</div>
+                                    <div id="preview-web" class="text-2xl font-black tracking-tight text-white">www.tutelcom.es</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="text-center">
+                            <p id="preview-legal" class="text-xs text-slate-400 tracking-wide font-light">
+                                Promoción válida hasta fin de mes. Sujeta a cobertura de fibra propia.
+                            </p>
+                        </div>
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+    </main>
+
+    <!-- Application Logic -->
+    <script>
+        // State Management
+        let currentFormat = 'square'; // 'square' or 'vertical'
+        let currentZoom = 0.65;
+        let features = [
+            { text: "Simetría Real 1000 Mbps", icon: "fa-gauge-high" },
+            { text: "Sin Límite de Descarga", icon: "fa-infinity" },
+            { text: "Llamadas Fijas Ilimitadas", icon: "fa-phone" },
+            { text: "Instalación y Router Gratis", icon: "fa-wifi" }
+        ];
+
+        // Sample Database
+        const samples = {
+            fiber: {
+                operator: "FIBRA MÁS",
+                logo: "https://placehold.co/120x40/4f46e5/ffffff?text=FIBRAMAS",
+                primaryColor: "#4f46e5",
+                secondaryColor: "#06b6d4",
+                title: "FIBRA ÓPTICA 1 Gbps",
+                price: "24,90",
+                priceSuffix: "€ / mes",
+                subtitle: "Máxima velocidad para toda la familia sin permanencia",
+                location: "Cádiz, España",
+                bgImage: "https://images.unsplash.com/photo-1513635269975-59663e0ac1ad?auto=format&fit=crop&w=1200&q=80",
+                phone: "900 800 100",
+                web: "www.fibramas.es",
+                legal: "Promoción válida para altas nuevas. Sujeta a disponibilidad geográfica.",
+                features: [
+                    { text: "Simetría Real 1000 Mbps", icon: "fa-gauge-high" },
+                    { text: "Sin Límite de Datos", icon: "fa-infinity" },
+                    { text: "Router Wi-Fi 6 Incluido", icon: "fa-wifi" },
+                    { text: "Sin Compromiso de Permanencia", icon: "fa-shield-halved" }
+                ]
+            },
+            convergent: {
+                operator: "TOTALPLAY",
+                logo: "https://placehold.co/120x40/ec4899/ffffff?text=TOTALPLAY",
+                primaryColor: "#db2777",
+                secondaryColor: "#8b5cf6",
+                title: "FIBRA 600 Mb + 2 MÓVILES",
+                price: "39,90",
+                priceSuffix: "€ / mes",
+                subtitle: "Fibra simétrica + 50GB en líneas móviles con 5G",
+                location: "Sevilla, España",
+                bgImage: "https://images.unsplash.com/photo-1526778548025-fa2f459cd5c1?auto=format&fit=crop&w=1200&q=80",
+                phone: "900 900 200",
+                web: "www.totalplay.es",
+                legal: "Incluye dos líneas móviles con llamadas ilimitadas. IVA incluido.",
+                features: [
+                    { text: "Fibra 600 Mb en Casa", icon: "fa-house-signal" },
+                    { text: "2 Líneas con 50GB + 5G", icon: "fa-mobile-screen" },
+                    { text: "Llamadas Fijo-Móvil Incluidas", icon: "fa-phone-flip" },
+                    { text: "Portabilidad en 24 Horas", icon: "fa-bolt" }
+                ]
+            },
+            business: {
+                operator: "EMPRESA NET",
+                logo: "https://placehold.co/120x40/0284c7/ffffff?text=EMPRESANET",
+                primaryColor: "#0284c7",
+                secondaryColor: "#10b981",
+                title: "FIBRA EMPRESAS 10 Gbps",
+                price: "49,90",
+                priceSuffix: "€ / mes + IVA",
+                subtitle: "IP fija dedicada, soporte prioritario 24/7 y centralita virtual",
+                location: "Madrid, España",
+                bgImage: "https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?auto=format&fit=crop&w=1200&q=80",
+                phone: "900 300 400",
+                web: "www.empresanet.es",
+                legal: "Exclusivo autónomos y empresas. SLA garantizado 99.9%.",
+                features: [
+                    { text: "IP Fija y Conexión Dedicada", icon: "fa-network-wired" },
+                    { text: "Soporte Técnico VIP 24/7", icon: "fa-headset" },
+                    { text: "Centralita Cloud Incluida", icon: "fa-cloud" },
+                    { text: "Backup 4G de Respaldo", icon: "fa-shield-heart" }
+                ]
+            }
+        };
+
+        // Background Color Presets
+        const bgPresets = {
+            midnight: { color: "#0f172a", gradient: "linear-gradient(135deg, #0f172a 0%, #1e1b4b 100%)", glow1: "#4f46e5", glow2: "#06b6d4" },
+            vibrant: { color: "#312e81", gradient: "linear-gradient(135deg, #312e81 0%, #701a75 100%)", glow1: "#ec4899", glow2: "#8b5cf6" },
+            darkblue: { color: "#020617", gradient: "linear-gradient(135deg, #020617 0%, #0f172a 100%)", glow1: "#0284c7", glow2: "#3b82f6" },
+            cleanlight: { color: "#f8fafc", gradient: "linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%)", glow1: "#cbd5e1", glow2: "#94a3b8" }
+        };
+
+        // Initialize App on Load
+        window.onload = function() {
+            renderFeaturesEditor();
+            updateContent();
+            updateZoomDisplay();
+        };
+
+        // Format Switcher
+        function setFormat(format) {
+            currentFormat = format;
+            const card = document.getElementById('poster-card');
+            const btnSquare = document.getElementById('format-square');
+            const btnVertical = document.getElementById('format-vertical');
+
+            if (format === 'square') {
+                card.className = "relative w-[1080px] h-[1080px] overflow-hidden flex flex-col justify-between text-white font-sans select-none";
+                btnSquare.className = "format-btn flex items-center justify-center space-x-2 py-2.5 px-3 rounded-xl border border-indigo-500 bg-indigo-600/10 text-indigo-300 font-medium text-xs transition";
+                btnVertical.className = "format-btn flex items-center justify-center space-x-2 py-2.5 px-3 rounded-xl border border-slate-700 bg-slate-800/50 text-slate-400 font-medium text-xs hover:border-slate-600 transition";
+                currentZoom = 0.65;
+            } else {
+                card.className = "relative w-[1080px] h-[1528px] overflow-hidden flex flex-col justify-between text-white font-sans select-none";
+                btnVertical.className = "format-btn flex items-center justify-center space-x-2 py-2.5 px-3 rounded-xl border border-indigo-500 bg-indigo-600/10 text-indigo-300 font-medium text-xs transition";
+                btnSquare.className = "format-btn flex items-center justify-center space-x-2 py-2.5 px-3 rounded-xl border border-slate-700 bg-slate-800/50 text-slate-400 font-medium text-xs hover:border-slate-600 transition";
+                currentZoom = 0.48;
+            }
+            updateZoomDisplay();
+        }
+
+        // Zoom Control
+        function zoomPreview(factor) {
+            currentZoom = Math.max(0.3, Math.min(1.5, currentZoom * factor));
+            updateZoomDisplay();
+        }
+
+        function updateZoomDisplay() {
+            const wrapper = document.getElementById('poster-wrapper');
+            wrapper.style.transform = `scale(${currentZoom})`;
+            document.getElementById('zoom-level').innerText = `${Math.round(currentZoom * 100)}%`;
+        }
+
+        // Sync Color Inputs
+        function syncColor(type) {
+            if (type === 'primary') {
+                const val = document.getElementById('text-color-primary').value;
+                if (val.startsWith('#') && (val.length === 4 || val.length === 7)) {
+                    document.getElementById('input-color-primary').value = val;
+                }
+            } else {
+                const val = document.getElementById('text-color-secondary').value;
+                if (val.startsWith('#') && (val.length === 4 || val.length === 7)) {
+                    document.getElementById('input-color-secondary').value = val;
+                }
+            }
+            updateContent();
+        }
+
+        // Apply Background Preset
+        function applyBgPreset(presetKey) {
+            if (presetKey === 'custom') return;
+            const preset = bgPresets[presetKey];
+            if (preset) {
+                document.getElementById('input-bg-color').value = preset.color;
+                updateContent();
+            }
+        }
+
+        // Load Sample Offers
+        function loadSample(key) {
+            const s = samples[key];
+            if (!s) return;
+            document.getElementById('input-operator').value = s.operator;
+            document.getElementById('input-logo').value = s.logo;
+            document.getElementById('input-color-primary').value = s.primaryColor;
+            document.getElementById('text-color-primary').value = s.primaryColor;
+            document.getElementById('input-color-secondary').value = s.secondaryColor;
+            document.getElementById('text-color-secondary').value = s.secondaryColor;
+            document.getElementById('input-title').value = s.title;
+            document.getElementById('input-price').value = s.price;
+            document.getElementById('input-price-suffix').value = s.priceSuffix;
+            document.getElementById('input-subtitle').value = s.subtitle;
+            document.getElementById('input-location').value = s.location;
+            document.getElementById('input-bg-image').value = s.bgImage;
+            document.getElementById('input-phone').value = s.phone;
+            document.getElementById('input-web').value = s.web;
+            document.getElementById('input-legal').value = s.legal;
+            features = JSON.parse(JSON.stringify(s.features));
+            renderFeaturesEditor();
+            updateContent();
+        }
+
+        // Fetch Location Photo via Unsplash Source API
+        function fetchLocationPhoto() {
+            const loc = document.getElementById('input-location').value.trim() || 'Spain';
+            const encoded = encodeURIComponent(loc + " city landmark architecture");
+            const photoUrl = `https://images.unsplash.com/photo-1513635269975-59663e0ac1ad?auto=format&fit=crop&w=1200&q=80`;
+            // Using query term to generate a dynamic realistic Unsplash search URL
+            const unsplashDynamic = `https://source.unsplash.com/1200x1200/?${encoded}`;
+            document.getElementById('input-bg-image').value = `https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&w=1200&q=80`;
+            updateContent();
+        }
+
+        // Features Management
+        function addFeature() {
+            features.push({ text: "Ventaja o característica sugerida", icon: "fa-check" });
+            renderFeaturesEditor();
+            updateContent();
+        }
+
+        function removeFeature(index) {
+            features.splice(index, 1);
+            renderFeaturesEditor();
+            updateContent();
+        }
+
+        function updateFeatureItem(index, field, value) {
+            features[index][field] = value;
+            updateContent();
+        }
+
+        function renderFeaturesEditor() {
+            const container = document.getElementById('features-container');
+            container.innerHTML = '';
+            features.forEach((f, idx) => {
+                const div = document.createElement('div');
+                div.className = "flex items-center space-x-2 bg-slate-800/80 p-2 rounded-xl border border-slate-700";
+                div.innerHTML = `
+                    <select onchange="updateFeatureItem(${idx}, 'icon', this.value)" class="bg-slate-900 border border-slate-700 rounded-lg p-1.5 text-xs text-white focus:outline-none">
+                        <option value="fa-check" ${f.icon==='fa-check'?'selected':''}>✓ Check</option>
+                        <option value="fa-gauge-high" ${f.icon==='fa-gauge-high'?'selected':''}>⚡ Velocidad</option>
+                        <option value="fa-infinity" ${f.icon==='fa-infinity'?'selected':''}>♾️ Infinito</option>
+                        <option value="fa-wifi" ${f.icon==='fa-wifi'?'selected':''}>📶 Wi-Fi</option>
+                        <option value="fa-phone" ${f.icon==='fa-phone'?'selected':''}>📞 Teléfono</option>
+                        <option value="fa-shield-halved" ${f.icon==='fa-shield-halved'?'selected':''}>🛡️ Seguridad</option>
+                        <option value="fa-mobile-screen" ${f.icon==='fa-mobile-screen'?'selected':''}>📱 Móvil</option>
+                        <option value="fa-cloud" ${f.icon==='fa-cloud'?'selected':''}>☁️ Cloud</option>
+                    </select>
+                    <input type="text" value="${f.text}" oninput="updateFeatureItem(${idx}, 'text', this.value)" class="flex-1 bg-slate-900 border border-slate-700 rounded-lg px-2.5 py-1.5 text-xs text-white focus:outline-none">
+                    <button onclick="removeFeature(${idx})" class="text-slate-400 hover:text-red-400 p-1.5 transition">
+                        <i class="fa-solid fa-trash-can text-xs"></i>
+                    </button>
+                `;
+                container.appendChild(div);
+            });
+        }
+
+        // Live Update Core Function
+        function updateContent() {
+            // Get values
+            const operator = document.getElementById('input-operator').value;
+            const logo = document.getElementById('input-logo').value;
+            const primaryColor = document.getElementById('input-color-primary').value;
+            const secondaryColor = document.getElementById('input-color-secondary').value;
+            const bgColor = document.getElementById('input-bg-color').value;
+            const bgOpacity = document.getElementById('input-bg-opacity').value;
+            const bgImage = document.getElementById('input-bg-image').value;
+            const title = document.getElementById('input-title').value;
+            const price = document.getElementById('input-price').value;
+            const priceSuffix = document.getElementById('input-price-suffix').value;
+            const subtitle = document.getElementById('input-subtitle').value;
+            const phone = document.getElementById('input-phone').value;
+            const web = document.getElementById('input-web').value;
+            const legal = document.getElementById('input-legal').value;
+
+            // Update text fields
+            document.getElementById('preview-operator').innerText = operator;
+            document.getElementById('preview-logo').src = logo;
+            document.getElementById('preview-title').innerText = title;
+            document.getElementById('preview-price').innerText = price;
+            document.getElementById('preview-price-suffix').innerText = priceSuffix;
+            document.getElementById('preview-subtitle').innerText = subtitle;
+            document.getElementById('preview-phone').innerText = phone;
+            document.getElementById('preview-web').innerText = web;
+            document.getElementById('preview-legal').innerText = legal;
+
+            // Update Background Color & Gradient
+            const colorLayer = document.getElementById('poster-bg-color-layer');
+            colorLayer.style.background = `linear-gradient(135deg, ${bgColor} 0%, #020617 100%)`;
+
+            // Update Background Image & Opacity
+            const imgLayer = document.getElementById('poster-bg-img-layer');
+            imgLayer.style.backgroundImage = `url('${bgImage}')`;
+            imgLayer.style.opacity = bgOpacity;
+
+            // Update Glow Colors
+            document.getElementById('poster-glow-1').style.backgroundColor = primaryColor;
+            document.getElementById('poster-glow-2').style.backgroundColor = secondaryColor;
+            document.getElementById('preview-badge').style.backgroundImage = `linear-gradient(to right, ${primaryColor}, ${secondaryColor})`;
+
+            // Render Preview Features Grid
+            const featuresPreviewContainer = document.getElementById('preview-features');
+            featuresPreviewContainer.innerHTML = '';
+            features.forEach(f => {
+                const item = document.createElement('div');
+                item.className = "flex items-center space-x-3 bg-slate-900/60 backdrop-blur-md px-5 py-3.5 rounded-2xl border border-white/10 shadow-lg text-left";
+                item.innerHTML = `
+                    <div class="w-9 h-9 rounded-xl flex items-center justify-center text-white shrink-0 shadow" style="background-color: ${primaryColor}">
+                        <i class="fa-solid ${f.icon} text-sm"></i>
+                    </div>
+                    <span class="font-semibold text-base text-slate-100 tracking-wide">${f.text}</span>
+                `;
+                featuresPreviewContainer.appendChild(item);
+            });
+        }
+
+        // Export Poster Image
+        function exportPoster() {
+            const posterCard = document.getElementById('poster-card');
+            const originalTransform = document.getElementById('poster-wrapper').style.transform;
+            document.getElementById('poster-wrapper').style.transform = 'scale(1)';
+
+            // Temporary remove shadows for clean export
+            html2canvas(posterCard, {
+                scale: 2,
+                useCORS: true,
+                allowTaint: true,
+                backgroundColor: null
+            }).then(canvas => {
+                const link = document.createElement('a');
+                link.download = 'cartel-telecom-pro.png';
+                link.href = canvas.toDataURL('image/png');
+                link.click();
+                document.getElementById('poster-wrapper').style.transform = originalTransform;
+            }).catch(err => {
+                console.error("Error al exportar:", err);
+                alert("No se pudo exportar la imagen directamente. Compruebe los permisos CORS de las imágenes externas.");
+                document.getElementById('poster-wrapper').style.transform = originalTransform;
+            });
+        }
+    </script>
+</body>
+</html>
